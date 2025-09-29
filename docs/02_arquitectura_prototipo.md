@@ -16,7 +16,10 @@ Para la primera etapa del proyecto, los cuartos de telecomunicaciones requieren 
 - Cerradura de puerta tipo solenoide ($85 MXN)
 - Hoja impresa con código QR con datos de contacto del administrador ($1 MXN)
 - Dos sensores HC-SR04 ($75 MXN)
-- Cables (? MXN)
+- 8 Jumpers (? MXN)
+- 2 Resistencias de 1 Ohm (? MXN)
+- 2 Resistencias de 2 Ohms (? MXN)
+- 1 protoboard
 
 > **Nota:** Todos los precios indicados corresponden al precio final para el consumidor obtenidos en Septiembre del 2025
 

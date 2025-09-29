@@ -20,7 +20,7 @@ Para poder implementar el prototipo, es importante que el cuarto de telecomunica
 - Cerradura de puerta tipo solenoide ($85 MXN)
 - Hoja impresa con código QR con datos de contacto del administrador ($1 MXN)
 - Dos sensores HC-SR04 ($75 MXN)
-- Cables (? MXN)
+- Cables (???)
 
 > **Nota:** Todos los precios indicados corresponden al precio final para el consumidor obtenidos en Septiembre del 2025
 
