@@ -26,27 +26,39 @@ def onError(sensor):
 def onEvent(eventType):
     print(f"Evento detectado: {eventType}")
 
+import time
+import RPi.GPIO as GPIO
+
 def measure_distance(trigger, echo):
     try:
-        # Generar pulso
+        # Generar pulso en TRIG
         GPIO.output(trigger, True)
-        time.sleep(0.00001)
+        time.sleep(0.00001)  # 10 µs
         GPIO.output(trigger, False)
 
-        # Esperar a que el eco empiece
-        start = time.time()
-        while GPIO.input(echo) == 0:
-            start = time.time()
+        # Esperar a que ECHO suba (HIGH) con timeout
+        start_time = time.time()
+        timeout = start_time + 0.02  # 20 ms
+        while GPIO.input(echo) == 0 and time.time() < timeout:
+            start_time = time.time()
+        if time.time() >= timeout:
+            onError((trigger, echo))
+            return None
 
-        # Esperar a que el eco termine
-        stop = time.time()
-        while GPIO.input(echo) == 1:
-            stop = time.time()
+        # Esperar a que ECHO baje (LOW) con timeout
+        stop_time = time.time()
+        timeout = stop_time + 0.02  # 20 ms
+        while GPIO.input(echo) == 1 and time.time() < timeout:
+            stop_time = time.time()
+        if time.time() >= timeout:
+            onError((trigger, echo))
+            return None
 
-        # Calcular distancia
-        elapsed = stop - start
+        # Calcular distancia en cm
+        elapsed = stop_time - start_time
         distance = (elapsed * 34300) / 2
         return distance
+
     except Exception:
         onError((trigger, echo))
         return None
