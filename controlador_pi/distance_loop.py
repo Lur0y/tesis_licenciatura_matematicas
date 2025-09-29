@@ -67,8 +67,13 @@ try:
     while True:
         d1 = measure_distance(GPIO_TRIGGER_1, GPIO_ECHO_1)
         d2 = measure_distance(GPIO_TRIGGER_2, GPIO_ECHO_2)
-        print(f"Distancia Sensor 1: {d1} cm, Sensor 2: {d2} cm")
+        isSomeoneInD1 = d1 is None or d1 < doorDistance
+        isSomeoneInD2 = d2 is None or d2 < doorDistance
         
+        if isSomeoneInD1:
+            print("Persona detectada en sensor 1")
+        if isSomeoneInD2:
+            print("Persona detectada en sensor 2")
 
 except KeyboardInterrupt:
     GPIO.cleanup()
