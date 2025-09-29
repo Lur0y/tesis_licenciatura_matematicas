@@ -67,26 +67,8 @@ try:
     while True:
         d1 = measure_distance(GPIO_TRIGGER_1, GPIO_ECHO_1)
         d2 = measure_distance(GPIO_TRIGGER_2, GPIO_ECHO_2)
-
-        # Guardamos si hay detección
-        t = time.time()
-        detected = []
-
-        if d1 is not None and d1 < doorDistance:
-            detected.append(("s1", t))
-        if d2 is not None and d2 < doorDistance:
-            detected.append(("s2", t))
-
-        # Verificar secuencia de detección
-        if len(detected) == 2:
-            s_first, t_first = detected[0]
-            s_second, t_second = detected[1]
-
-            if (t_second - t_first) <= speed:
-                if s_first == "s1" and s_second == "s2":
-                    onEvent("in")
-                elif s_first == "s2" and s_second == "s1":
-                    onEvent("out")
+        print(f"Distancia Sensor 1: {d1} cm, Sensor 2: {d2} cm")
+        
 
 except KeyboardInterrupt:
     GPIO.cleanup()
