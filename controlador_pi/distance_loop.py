@@ -2,8 +2,8 @@ import RPi.GPIO as GPIO
 import time
 
 # Constantes
-doorDistance = 20.0  # Distancia del sensor a la puerta medida en centimetros
-speed = 0.5          # Tiempo máximo entre detecciones para considerar que es la misma persona (Segundos)
+doorDistance = 29.0  # Distancia del sensor a la puerta medida en centimetros
+speed = 0.5            # Tiempo máximo entre detecciones para considerar que es la misma persona (Segundos)
 
 # Pines del sensor 1
 GPIO_TRIGGER_1 = 23
@@ -75,8 +75,6 @@ try:
                     onEvent("in")
                 elif s_first == "s2" and s_second == "s1":
                     onEvent("out")
-
-        time.sleep(0.1)
 
 except KeyboardInterrupt:
     GPIO.cleanup()
