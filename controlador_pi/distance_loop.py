@@ -20,9 +20,6 @@ GPIO.setup(GPIO_ECHO_1, GPIO.IN)
 GPIO.setup(GPIO_TRIGGER_2, GPIO.OUT)
 GPIO.setup(GPIO_ECHO_2, GPIO.IN)
 
-def onError(sensor):
-    print(f"Error con el sensor: {sensor}")
-
 def onEvent(eventType):
     print(f"Evento detectado: {eventType}")
 
@@ -42,7 +39,6 @@ def measure_distance(trigger, echo):
         while GPIO.input(echo) == 0 and time.time() < timeout:
             start_time = time.time()
         if time.time() >= timeout:
-            onError((trigger, echo))
             return None
 
         # Esperar a que ECHO baje (LOW) con timeout
@@ -51,7 +47,6 @@ def measure_distance(trigger, echo):
         while GPIO.input(echo) == 1 and time.time() < timeout:
             stop_time = time.time()
         if time.time() >= timeout:
-            onError((trigger, echo))
             return None
 
         # Calcular distancia en cm
