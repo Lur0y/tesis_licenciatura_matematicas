@@ -67,19 +67,11 @@ try:
         isSomeoneInD2 = d2 is None or d2 < doorDistance
         
         if isSomeoneInD1:
-            d2 = measure_distance(GPIO_TRIGGER_2, GPIO_ECHO_2)
-            isSomeoneInD2 = d2 is None or d2 < doorDistance
-            if(isSomeoneInD2):
-                onEvent("Entrada")
-                isSomeoneInD1 = False
-                isSomeoneInD2 = False
+            onEvent("Entrada")
         if isSomeoneInD2:
-            d1 = measure_distance(GPIO_TRIGGER_1, GPIO_ECHO_1)
-            isSomeoneInD2 = d1 is None or d1 < doorDistance
-            if(isSomeoneInD1):
-                onEvent("Salida")
-                isSomeoneInD1 = False
-                isSomeoneInD2 = False
+            onEvent("Salida")
+    
+     time.sleep(0.1)
 
 except KeyboardInterrupt:
     GPIO.cleanup()
