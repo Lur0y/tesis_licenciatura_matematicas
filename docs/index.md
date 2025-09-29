@@ -22,6 +22,3 @@ De acuerdo con los resultados obtenidos durante la prueba piloto, se contempla u
 - [Arquitectura del prototipo](02_arquitectura_prototipo.md02)
 - [Visión general del funcionamiento](03_vision_general_funcionamiento.md)
 - [Documento de tesis]()
-
-![Diagrama](./img/diagrama.png)
-...
