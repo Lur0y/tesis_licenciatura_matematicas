@@ -3,7 +3,7 @@ import time
 
 # Constantes
 doorDistance = 29.0  # Distancia del sensor a la puerta medida en centimetros
-speed = 0.5          # Tiempo máximo entre detecciones para considerar que es la misma persona (Segundos)
+speed = 2            # Tiempo máximo entre detecciones para considerar que es la misma persona (Segundos)
 
 # Pines del sensor 1
 GPIO_TRIGGER_1 = 23
@@ -22,6 +22,7 @@ GPIO.setup(GPIO_ECHO_2, GPIO.IN)
 
 def onEvent(eventType):
     print(f"Evento detectado: {eventType}")
+    time.sleep(speed)
 
 import time
 import RPi.GPIO as GPIO
@@ -72,7 +73,6 @@ try:
                 onEvent("Entrada")
                 isSomeoneInD1 = False
                 isSomeoneInD2 = False
-                sleep(speed)
         if isSomeoneInD2:
             d1 = measure_distance(GPIO_TRIGGER_2, GPIO_ECHO_2)
             isSomeoneInD2 = d1 is None or d1 < doorDistance
@@ -80,7 +80,6 @@ try:
                 onEvent("Salida")
                 isSomeoneInD1 = False
                 isSomeoneInD2 = False
-                sleep(speed)
 
 except KeyboardInterrupt:
     GPIO.cleanup()
