@@ -74,7 +74,7 @@ try:
                 isSomeoneInD1 = False
                 isSomeoneInD2 = False
         if isSomeoneInD2:
-            d1 = measure_distance(GPIO_TRIGGER_2, GPIO_ECHO_2)
+            d1 = measure_distance(GPIO_TRIGGER_1, GPIO_ECHO_1)
             isSomeoneInD2 = d1 is None or d1 < doorDistance
             if(isSomeoneInD1):
                 onEvent("Salida")
