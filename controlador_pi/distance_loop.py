@@ -3,7 +3,7 @@ import time
 
 # Constantes
 doorDistance = 29.0  # Distancia del sensor a la puerta medida en centimetros
-speed = 2            # Tiempo máximo entre detecciones para considerar que es la misma persona (Segundos)
+speed = 5            # Tiempo máximo entre detecciones para considerar que es la misma persona (Segundos)
 
 # Pines del sensor 1
 GPIO_TRIGGER_1 = 23
@@ -22,7 +22,9 @@ GPIO.setup(GPIO_ECHO_2, GPIO.IN)
 
 def onEvent(eventType):
     print(f"Evento detectado: {eventType}")
+    print("Analizando...")
     time.sleep(speed)
+    print("Esperando siguiente evento...")
 
 import time
 import RPi.GPIO as GPIO
