@@ -71,7 +71,7 @@ try:
         if isSomeoneInD2:
             onEvent("Salida")
     
-     time.sleep(0.1)
+    time.sleep(0.1)
 
 except KeyboardInterrupt:
     GPIO.cleanup()
