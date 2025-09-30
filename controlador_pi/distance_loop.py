@@ -36,13 +36,15 @@ for _ in range(5):
 def onEvent(eventType):
     print(f"Evento detectado: {eventType}")
     print("Analizando...")
-    folder = "fotos"
-    frame = picam2.capture_array()
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    filename = f"evento_{timestamp}.jpg"
-    filepath = os.path.join(folder, filename)
-    cv2.imwrite(filepath, frame)
-    time.sleep(1)
+    contador = 0
+    while time.time() - start_time < 1:
+        frame = picam2.capture_array()
+        filename = f"evento_{timestamp_base}_{contador}.jpg"
+        filepath = os.path.join(folder, filename)
+        cv2.imwrite(filepath, frame)
+        contador += 1
+        time.sleep(0.1)
+    print(f"Se tomaron {contador} fotos en 1s")
     print("Esperando siguiente evento...")
 
 import time
