@@ -36,7 +36,9 @@ for _ in range(5):
 def onEvent(eventType):
     print(f"Evento detectado: {eventType}")
     print("Analizando...")
-    contador = 0
+    folder = "fotos"
+    start_time = time.time()
+    timestamp_base = datetime.now().strftime("%Y%m%d_%H%M%S")
     while time.time() - start_time < 1:
         frame = picam2.capture_array()
         filename = f"evento_{timestamp_base}_{contador}.jpg"
