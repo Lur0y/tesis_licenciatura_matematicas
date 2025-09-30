@@ -39,6 +39,7 @@ def onEvent(eventType):
     folder = "fotos"
     start_time = time.time()
     timestamp_base = datetime.now().strftime("%Y%m%d_%H%M%S")
+    contador = 0
     while time.time() - start_time < 1:
         frame = picam2.capture_array()
         filename = f"evento_{timestamp_base}_{contador}.jpg"
