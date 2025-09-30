@@ -89,6 +89,9 @@ def onEvent(eventType):
     event_id = get_next_event_id()
     print(f"ID del evento: {event_id}")
     
+    # Normalizar el tipo de evento para el nombre del archivo (minúsculas, sin espacios)
+    event_type_normalized = eventType.lower().replace(" ", "_")
+    
     folder = config.get('STORAGE', 'photo_folder')
     photo_duration = config.getfloat('TIMING', 'photo_duration')
     photo_interval = config.getfloat('TIMING', 'photo_interval')
@@ -98,13 +101,13 @@ def onEvent(eventType):
     
     while time.time() - start_time < photo_duration:
         frame = picam2.capture_array()
-        filename = f"evento_{event_id}_foto_no_{contador}.jpg"
+        filename = f"evento_{event_id}_tipo_{event_type_normalized}_foto_no_{contador}.jpg"
         filepath = os.path.join(folder, filename)
         cv2.imwrite(filepath, frame)
         contador += 1
         time.sleep(photo_interval)
     
-    print(f"Se tomaron {contador-1} fotos para el evento {event_id}")
+    print(f"Se tomaron {contador-1} fotos para el evento {event_id} (tipo: {eventType})")
     print("Esperando siguiente evento...")
 
 import time
