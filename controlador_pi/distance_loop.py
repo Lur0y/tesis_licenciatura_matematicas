@@ -1,9 +1,11 @@
 import RPi.GPIO as GPIO
 import time
+from picamera2 import Picamera2
+import cv2
 
 # Constantes
-doorDistance = 29.0  # Distancia del sensor a la puerta medida en centimetros
-speed = 5            # Tiempo máximo entre detecciones para considerar que es la misma persona (Segundos)
+doorDistance = 19.5  # Distancia del sensor a la puerta medida en centimetros
+speed = 1            # Tiempo máximo entre detecciones para considerar que es la misma persona (Segundos)
 
 # Pines del sensor 1
 GPIO_TRIGGER_1 = 23
@@ -19,6 +21,15 @@ GPIO.setup(GPIO_TRIGGER_1, GPIO.OUT)
 GPIO.setup(GPIO_ECHO_1, GPIO.IN)
 GPIO.setup(GPIO_TRIGGER_2, GPIO.OUT)
 GPIO.setup(GPIO_ECHO_2, GPIO.IN)
+
+# Preparacion de la camara
+picam2 = Picamera2()
+picam2.configure(picam2.create_preview_configuration(main={"format": 'XRGB8888', "size": (640, 480)}))
+picam2.start()
+time.sleep(2)
+for _ in range(5):
+    picam2.capture_array()
+    time.sleep(0.2)
 
 def onEvent(eventType):
     print(f"Evento detectado: {eventType}")
@@ -65,13 +76,17 @@ try:
     while True:
         d1 = measure_distance(GPIO_TRIGGER_1, GPIO_ECHO_1)
         d2 = measure_distance(GPIO_TRIGGER_2, GPIO_ECHO_2)
-        isSomeoneInD1 = d1 is None or d1 < doorDistance
-        isSomeoneInD2 = d2 is None or d2 < doorDistance
+        
+        if d1 is None or d2 is None:
+            continue
+        
+        isSomeoneInD1 = d1 < doorDistance
+        isSomeoneInD2 = d2 < doorDistance
         
         if isSomeoneInD1:
-            onEvent("Entrada")
-        if isSomeoneInD2:
             onEvent("Salida")
+        if isSomeoneInD2:
+            onEvent("Entrada")
     
     time.sleep(0.1)
 
