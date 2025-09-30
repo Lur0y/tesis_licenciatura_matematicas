@@ -56,24 +56,55 @@ for _ in range(capture_frames):
     picam2.capture_array()
     time.sleep(capture_delay)
 
+def get_next_event_id():
+    """Obtiene el siguiente ID de evento desde data.txt y lo incrementa"""
+    data_file = os.path.join(os.path.dirname(__file__), 'data.txt')
+    
+    try:
+        # Leer el número actual
+        with open(data_file, 'r') as f:
+            content = f.read().strip()
+            if content.startswith('event_number='):
+                current_id = int(content.split('=')[1])
+            else:
+                current_id = 0
+    except (FileNotFoundError, ValueError):
+        # Si el archivo no existe o hay error, empezar desde 1
+        current_id = 0
+    
+    # Incrementar para el nuevo evento
+    next_id = current_id + 1
+    
+    # Guardar el nuevo número
+    with open(data_file, 'w') as f:
+        f.write(f'event_number={next_id}')
+    
+    return next_id
+
 def onEvent(eventType):
     print(f"Evento detectado: {eventType}")
     print("Analizando...")
+    
+    # Obtener ID único para este evento
+    event_id = get_next_event_id()
+    print(f"ID del evento: {event_id}")
+    
     folder = config.get('STORAGE', 'photo_folder')
     photo_duration = config.getfloat('TIMING', 'photo_duration')
     photo_interval = config.getfloat('TIMING', 'photo_interval')
     
     start_time = time.time()
-    timestamp_base = datetime.now().strftime("%Y%m%d_%H%M%S")
-    contador = 0
+    contador = 1  # Empezar desde 1 para las fotos
+    
     while time.time() - start_time < photo_duration:
         frame = picam2.capture_array()
-        filename = f"evento_{timestamp_base}_{contador}.jpg"
+        filename = f"evento_{event_id}_foto_no_{contador}.jpg"
         filepath = os.path.join(folder, filename)
         cv2.imwrite(filepath, frame)
         contador += 1
         time.sleep(photo_interval)
-    print(f"Se tomaron {contador} fotos en {photo_duration}s")
+    
+    print(f"Se tomaron {contador-1} fotos para el evento {event_id}")
     print("Esperando siguiente evento...")
 
 import time
