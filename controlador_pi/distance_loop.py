@@ -4,18 +4,34 @@ import os
 from picamera2 import Picamera2
 from datetime import datetime
 import cv2
+import configparser
 
-# Constantes
-doorDistance = 19.5  # Distancia del sensor a la puerta medida en centimetros
-speed = 1            # Tiempo máximo entre detecciones para considerar que es la misma persona (Segundos)
+# Cargar configuración desde archivo .conf
+def load_config():
+    config = configparser.ConfigParser()
+    config_file = os.path.join(os.path.dirname(__file__), 'config.conf')
+    config.read(config_file)
+    return config
+
+# Inicializar configuración
+config = load_config()
+
+# Constantes desde archivo de configuración
+doorDistance = config.getfloat('SENSOR', 'door_distance')
+speed = config.getint('SENSOR', 'speed')
+
+# Crear directorio de fotos si no existe
+photo_folder = config.get('STORAGE', 'photo_folder')
+if not os.path.exists(photo_folder):
+    os.makedirs(photo_folder)
 
 # Pines del sensor 1
-GPIO_TRIGGER_1 = 23
-GPIO_ECHO_1 = 24
+GPIO_TRIGGER_1 = config.getint('GPIO_PINS', 'gpio_trigger_1')
+GPIO_ECHO_1 = config.getint('GPIO_PINS', 'gpio_echo_1')
 
 # Pines del sensor 2
-GPIO_TRIGGER_2 = 17
-GPIO_ECHO_2 = 27
+GPIO_TRIGGER_2 = config.getint('GPIO_PINS', 'gpio_trigger_2')
+GPIO_ECHO_2 = config.getint('GPIO_PINS', 'gpio_echo_2')
 
 # Configuración GPIO
 GPIO.setmode(GPIO.BCM)
@@ -25,44 +41,57 @@ GPIO.setup(GPIO_TRIGGER_2, GPIO.OUT)
 GPIO.setup(GPIO_ECHO_2, GPIO.IN)
 
 # Preparacion de la camara
+camera_format = config.get('CAMERA', 'format')
+camera_width = config.getint('CAMERA', 'width')
+camera_height = config.getint('CAMERA', 'height')
+warmup_time = config.getfloat('CAMERA', 'warmup_time')
+capture_frames = config.getint('CAMERA', 'capture_frames')
+capture_delay = config.getfloat('CAMERA', 'capture_delay')
+
 picam2 = Picamera2()
-picam2.configure(picam2.create_preview_configuration(main={"format": 'XRGB8888', "size": (640, 480)}))
+picam2.configure(picam2.create_preview_configuration(main={"format": camera_format, "size": (camera_width, camera_height)}))
 picam2.start()
-time.sleep(2)
-for _ in range(5):
+time.sleep(warmup_time)
+for _ in range(capture_frames):
     picam2.capture_array()
-    time.sleep(0.2)
+    time.sleep(capture_delay)
 
 def onEvent(eventType):
     print(f"Evento detectado: {eventType}")
     print("Analizando...")
-    folder = "fotos"
+    folder = config.get('STORAGE', 'photo_folder')
+    photo_duration = config.getfloat('TIMING', 'photo_duration')
+    photo_interval = config.getfloat('TIMING', 'photo_interval')
+    
     start_time = time.time()
     timestamp_base = datetime.now().strftime("%Y%m%d_%H%M%S")
     contador = 0
-    while time.time() - start_time < 2:
+    while time.time() - start_time < photo_duration:
         frame = picam2.capture_array()
         filename = f"evento_{timestamp_base}_{contador}.jpg"
         filepath = os.path.join(folder, filename)
         cv2.imwrite(filepath, frame)
         contador += 1
-        time.sleep(0.1)
-    print(f"Se tomaron {contador} fotos en 1s")
+        time.sleep(photo_interval)
+    print(f"Se tomaron {contador} fotos en {photo_duration}s")
     print("Esperando siguiente evento...")
 
 import time
 import RPi.GPIO as GPIO
 
 def measure_distance(trigger, echo):
+    trigger_pulse_time = config.getfloat('TIMING', 'trigger_pulse_time')
+    echo_timeout = config.getfloat('TIMING', 'echo_timeout')
+    
     try:
         # Generar pulso en TRIG
         GPIO.output(trigger, True)
-        time.sleep(0.00001)  # 10 µs
+        time.sleep(trigger_pulse_time)  # Tiempo de pulso configurable
         GPIO.output(trigger, False)
 
         # Esperar a que ECHO suba (HIGH) con timeout
         start_time = time.time()
-        timeout = start_time + 0.02  # 20 ms
+        timeout = start_time + echo_timeout  # Timeout configurable
         while GPIO.input(echo) == 0 and time.time() < timeout:
             start_time = time.time()
         if time.time() >= timeout:
@@ -70,7 +99,7 @@ def measure_distance(trigger, echo):
 
         # Esperar a que ECHO baje (LOW) con timeout
         stop_time = time.time()
-        timeout = stop_time + 0.02  # 20 ms
+        timeout = stop_time + echo_timeout  # Timeout configurable
         while GPIO.input(echo) == 1 and time.time() < timeout:
             stop_time = time.time()
         if time.time() >= timeout:
@@ -82,7 +111,7 @@ def measure_distance(trigger, echo):
         return distance
 
     except Exception:
-        onError((trigger, echo))
+        # onError((trigger, echo))  # Comentado ya que no está definida la función
         return None
 
 try:
@@ -101,7 +130,8 @@ try:
         if isSomeoneInD2:
             onEvent("Entrada")
     
-    time.sleep(0.1)
+        main_loop_delay = config.getfloat('TIMING', 'main_loop_delay')
+        time.sleep(main_loop_delay)
 
 except KeyboardInterrupt:
     GPIO.cleanup()
