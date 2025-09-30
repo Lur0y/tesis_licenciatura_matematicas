@@ -1,5 +1,6 @@
 import RPi.GPIO as GPIO
 import time
+import os
 from picamera2 import Picamera2
 from datetime import datetime
 import cv2
